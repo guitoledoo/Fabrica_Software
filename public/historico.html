@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico - Gestão de Ativos TI</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🖥️ Gestão de Ativos TI</div>
+    <div class="navbar-menu">
+      <a href="/index.html" class="nav-link">Dashboard</a>
+      <a href="/ativos.html" class="nav-link">Ativos</a>
+      <a href="/agencias.html" class="nav-link">Agências</a>
+      <a href="/estoque.html" class="nav-link">Estoque</a>
+      <a href="/historico.html" class="nav-link ativo">Histórico</a>
+    </div>
+    <div class="navbar-user">
+      <span id="usuario-nome"></span>
+      <button id="btn-logout" class="btn-logout">Sair</button>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1 class="titulo-pagina">📜 Histórico de Auditoria</h1>
+
+    <div class="painel">
+      <table class="tabela" id="tabela-historico">
+        <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Ativo</th>
+            <th>Equipamento</th>
+            <th>Tipo</th>
+            <th>Descrição</th>
+            <th>Registrado por</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div style="display:flex; justify-content:center; gap:10px; margin-top:18px;">
+        <button id="btn-anterior" class="btn btn-secundario btn-pequeno">← Anterior</button>
+        <span id="info-pagina" style="align-self:center; color:var(--neutro-500); font-size:0.9rem;"></span>
+        <button id="btn-proximo" class="btn btn-secundario btn-pequeno">Próxima →</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/historico.js"></script>
+</body>
+</html>

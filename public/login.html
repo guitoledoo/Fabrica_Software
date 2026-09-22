@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Gestão de Ativos TI</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <h1>🔐 Gestão de Ativos TI</h1>
+    <p class="login-subtitle">Sistema de controle de patrimônio</p>
+
+    <form id="form-login">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" required placeholder="admin@gestao.com">
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" required placeholder="••••••••">
+      </div>
+      <div id="erro-login" class="erro-msg" style="display:none;"></div>
+      <button type="submit" class="btn-principal">Entrar</button>
+    </form>
+  </div>
+
+  <script src="/js/login.js"></script>
+</body>
+</html>

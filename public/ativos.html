@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ativos - Gestão de Ativos TI</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">🖥️ Gestão de Ativos TI</div>
+    <div class="navbar-menu">
+      <a href="/index.html" class="nav-link">Dashboard</a>
+      <a href="/ativos.html" class="nav-link ativo">Ativos</a>
+      <a href="/agencias.html" class="nav-link">Agências</a>
+      <a href="/estoque.html" class="nav-link">Estoque</a>
+      <a href="/historico.html" class="nav-link">Histórico</a>
+    </div>
+    <div class="navbar-user">
+      <span id="usuario-nome"></span>
+      <button id="btn-logout" class="btn-logout">Sair</button>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="cabecalho-pagina">
+      <h1 class="titulo-pagina">💻 Ativos</h1>
+      <button id="btn-novo" class="btn btn-primario">+ Novo Ativo</button>
+    </div>
+
+    <!-- Barra de filtros -->
+    <div class="barra-filtros">
+      <input type="text" id="filtro-busca" placeholder="🔍 Buscar por Service Tag, patrimônio, marca, modelo ou usuário...">
+      <select id="filtro-agencia">
+        <option value="">Todas as agências</option>
+      </select>
+      <select id="filtro-status">
+        <option value="">Todos os status</option>
+        <option value="Em Uso">Em Uso</option>
+        <option value="Em Estoque">Em Estoque</option>
+        <option value="Manutenção">Manutenção</option>
+      </select>
+    </div>
+
+    <!-- Tabela de ativos -->
+    <div class="painel">
+      <table class="tabela" id="tabela-ativos">
+        <thead>
+          <tr>
+            <th>Service Tag</th>
+            <th>Equipamento</th>
+            <th>Categoria</th>
+            <th>Agência</th>
+            <th>Usuário</th>
+            <th>Status</th>
+            <th>Garantia</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Modal de criar/editar -->
+  <div class="modal-fundo" id="modal-ativo">
+    <div class="modal">
+      <div class="modal-cabecalho">
+        <h3 id="modal-titulo">Novo Ativo</h3>
+        <button class="modal-fechar" onclick="fecharModal()">&times;</button>
+      </div>
+      <div class="modal-corpo">
+        <form id="form-ativo">
+          <div class="form-grid">
+            <div class="form-group col-inteira">
+              <label for="f-id">Service Tag *</label>
+              <input type="text" id="f-id" required placeholder="Ex: ABCD12E" maxlength="10">
+            </div>
+            <div class="form-group">
+              <label for="f-patrimonio">Patrimônio</label>
+              <input type="text" id="f-patrimonio" placeholder="Ex: PAT-00123">
+            </div>
+            <div class="form-group">
+              <label for="f-categoria">Categoria</label>
+              <select id="f-categoria">
+                <option value="Desktop">Desktop</option>
+                <option value="Notebook">Notebook</option>
+                <option value="Monitor">Monitor</option>
+                <option value="Impressora">Impressora</option>
+                <option value="Servidor">Servidor</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-marca">Marca</label>
+              <input type="text" id="f-marca" placeholder="Ex: Dell">
+            </div>
+            <div class="form-group">
+              <label for="f-modelo">Modelo</label>
+              <input type="text" id="f-modelo" placeholder="Ex: OptiPlex 7010">
+            </div>
+            <div class="form-group">
+              <label for="f-agencia">Agência</label>
+              <select id="f-agencia">
+                <option value="">— Sem agência —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-usuario">Usuário Responsável</label>
+              <input type="text" id="f-usuario" placeholder="Ex: joao.silva">
+            </div>
+            <div class="form-group">
+              <label for="f-status">Status</label>
+              <select id="f-status">
+                <option value="Em Uso">Em Uso</option>
+                <option value="Em Estoque">Em Estoque</option>
+                <option value="Manutenção">Manutenção</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-processador">Processador</label>
+              <input type="text" id="f-processador" placeholder="Ex: Core i5-10500">
+            </div>
+            <div class="form-group">
+              <label for="f-geracao">Geração</label>
+              <input type="text" id="f-geracao" placeholder="Ex: 10ª">
+            </div>
+            <div class="form-group">
+              <label for="f-ram">Memória RAM</label>
+              <input type="text" id="f-ram" placeholder="Ex: 16GB">
+            </div>
+            <div class="form-group">
+              <label for="f-so">Sistema Operacional</label>
+              <input type="text" id="f-so" placeholder="Ex: Windows 11 Pro">
+            </div>
+            <div class="form-group">
+              <label for="f-aquisicao">Data de Aquisição</label>
+              <input type="date" id="f-aquisicao">
+            </div>
+            <div class="form-group">
+              <label for="f-inicio-garantia">Início da Garantia</label>
+              <input type="date" id="f-inicio-garantia">
+            </div>
+            <div class="form-group">
+              <label for="f-fim-garantia">Fim da Garantia</label>
+              <input type="date" id="f-fim-garantia">
+            </div>
+            <div class="form-group col-inteira">
+              <label for="f-descricao">Observações</label>
+              <textarea id="f-descricao" rows="3" placeholder="Detalhes adicionais do equipamento..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-rodape">
+        <button class="btn btn-secundario" onclick="fecharModal()">Cancelar</button>
+        <button class="btn btn-primario" id="btn-salvar">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmação de exclusão -->
+  <div class="modal-fundo" id="modal-excluir">
+    <div class="modal" style="max-width: 440px;">
+      <div class="modal-cabecalho">
+        <h3>⚠️ Confirmar Exclusão</h3>
+        <button class="modal-fechar" onclick="fecharModalExcluir()">&times;</button>
+      </div>
+      <div class="modal-corpo">
+        <p>Tem certeza que deseja <strong>excluir permanentemente</strong> o ativo <strong id="excluir-id"></strong>?</p>
+        <p style="margin-top: 10px; color: var(--neutro-500); font-size: 0.88rem;">Esta ação será registrada no histórico de auditoria.</p>
+      </div>
+      <div class="modal-rodape">
+        <button class="btn btn-secundario" onclick="fecharModalExcluir()">Cancelar</button>
+        <button class="btn btn-perigo" id="btn-confirmar-excluir">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/ativos.js"></script>
+</body>
+</html>

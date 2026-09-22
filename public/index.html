@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel - Gestão de Ativos TI</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- ===== BARRA DE NAVEGAÇÃO ===== -->
+  <nav class="navbar">
+    <div class="navbar-brand">🖥️ Gestão de Ativos TI</div>
+    <div class="navbar-menu">
+      <a href="/index.html" class="nav-link ativo">Dashboard</a>
+      <a href="/ativos.html" class="nav-link">Ativos</a>
+      <a href="/agencias.html" class="nav-link">Agências</a>
+      <a href="/estoque.html" class="nav-link">Estoque</a>
+      <a href="/historico.html" class="nav-link">Histórico</a>
+    </div>
+    <div class="navbar-user">
+      <span id="usuario-nome"></span>
+      <button id="btn-logout" class="btn-logout">Sair</button>
+    </div>
+  </nav>
+
+  <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+  <main class="container">
+    <h1 class="titulo-pagina">📊 Dashboard</h1>
+
+    <!-- Cards de resumo -->
+    <div class="cards-resumo">
+      <div class="card-resumo card-azul">
+        <div class="card-numero" id="total-ativos">-</div>
+        <div class="card-label">Total de Ativos</div>
+      </div>
+      <div class="card-resumo card-verde">
+        <div class="card-numero" id="total-em-uso">-</div>
+        <div class="card-label">Em Uso</div>
+      </div>
+      <div class="card-resumo card-cinza">
+        <div class="card-numero" id="total-em-estoque">-</div>
+        <div class="card-label">Em Estoque</div>
+      </div>
+      <div class="card-resumo card-laranja">
+        <div class="card-numero" id="total-manutencao">-</div>
+        <div class="card-label">Em Manutenção</div>
+      </div>
+      <div class="card-resumo card-roxo">
+        <div class="card-numero" id="total-agencias">-</div>
+        <div class="card-label">Agências</div>
+      </div>
+    </div>
+
+    <!-- Painéis de alerta -->
+    <div class="painel-grid">
+      <div class="painel">
+        <h2>⏰ Garantias Vencendo (90 dias)</h2>
+        <table class="tabela" id="tabela-garantias">
+          <thead>
+            <tr><th>Service Tag</th><th>Equipamento</th><th>Vence em</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="painel">
+        <h2>⚠️ Estoque Abaixo do Mínimo</h2>
+        <table class="tabela" id="tabela-estoque">
+          <thead>
+            <tr><th>Item</th><th>Saldo</th><th>Mínimo</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Últimas atividades -->
+    <div class="painel">
+      <h2>📋 Últimas Atividades</h2>
+      <table class="tabela" id="tabela-atividades">
+        <thead>
+          <tr><th>Data/Hora</th><th>Ativo</th><th>Tipo</th><th>Descrição</th><th>Usuário</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
