@@ -1,4 +1,3 @@
-// src/app.js
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -17,7 +16,6 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Serve os arquivos estáticos do frontend (HTML, CSS, JS)
 app.use(express.static('public'));
 
 app.get('/api/teste', (req, res) => {

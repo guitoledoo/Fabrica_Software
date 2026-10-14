@@ -1,69 +1,58 @@
 // src/controllers/authController.js
+const db = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('../config/database');
 
 // ============================================================
 //  POST /api/auth/login
-//  Recebe email e senha, valida no banco, retorna um token JWT
+//  Autentica o usuário e devolve um token JWT válido por 8h
 // ============================================================
 async function login(req, res) {
-  const { email, senha } = req.body;
-
-  // 1. Validação básica — os campos vieram?
-  if (!email || !senha) {
-    return res.status(400).json({
-      erro: 'Email e senha são obrigatórios'
-    });
-  }
-
   try {
-    // 2. Busca o usuário no banco pelo email
+    const { email, senha } = req.body;
+
+    // Validação básica de presença
+    if (!email || !senha) {
+      return res.status(400).json({ erro: 'Email e senha são obrigatórios' });
+    }
+
+    // Busca o usuário pelo email
+    // (a tabela usa senha_hash — NÃO existe coluna "ativo")
     const [rows] = await db.query(
       'SELECT id, nome, email, senha_hash, nivel FROM usuarios WHERE email = ?',
       [email]
     );
 
-    // 3. Usuário não existe? Responde igual a "senha errada"
-    //    Nunca diga "usuário não encontrado" — isso vaza quem
-    //    está cadastrado no sistema (ataque de enumeração)
     if (rows.length === 0) {
-      return res.status(401).json({
-        erro: 'Email ou senha incorretos'
-      });
+      // Mensagem genérica de propósito: não revela se o email existe
+      return res.status(401).json({ erro: 'Email ou senha incorretos' });
     }
 
     const usuario = rows[0];
 
-    // 4. Compara a senha enviada com o hash armazenado
-    //    bcrypt.compare extrai o salt do hash e recria o hash
-    //    da senha enviada — se coincidir, a senha está correta
-    const senhaCorreta = await bcrypt.compare(senha, usuario.senha_hash);
+    // Compara a senha digitada com o hash armazenado (bcrypt)
+    const senhaValida = await bcrypt.compare(senha, usuario.senha_hash);
 
-    if (!senhaCorreta) {
-      return res.status(401).json({
-        erro: 'Email ou senha incorretos'
-      });
+    if (!senhaValida) {
+      return res.status(401).json({ erro: 'Email ou senha incorretos' });
     }
 
-    // 5. Gera o token JWT
-    //    O token contém: id do usuário, nome, email, nível
-    //    Esses dados ficam visíveis (mas não editáveis) no token
+    // Gera o token JWT com os dados do usuário no payload
     const token = jwt.sign(
       {
         id: usuario.id,
-        nome: usuario.nome,
         email: usuario.email,
+        nome: usuario.nome,
         nivel: usuario.nivel
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
     );
 
-    // 6. Retorna o token e os dados do usuário (sem a senha!)
+    // Devolve o token e os dados (sem o hash da senha!)
     res.json({
       mensagem: 'Login realizado com sucesso',
-      token: token,
+      token,
       usuario: {
         id: usuario.id,
         nome: usuario.nome,
@@ -78,4 +67,43 @@ async function login(req, res) {
   }
 }
 
-module.exports = { login };
+// ============================================================
+//  POST /api/auth/cadastro
+//  Cria um novo usuário (provisionamento). O hash da senha é
+//  gerado aqui — nunca armazenamos a senha em texto puro
+// ============================================================
+async function cadastrar(req, res) {
+  try {
+    const { nome, email, senha, nivel } = req.body;
+
+    if (!nome || !email || !senha) {
+      return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios' });
+    }
+
+    // Nível só pode ser Admin ou Leitor (mesma enum da tabela)
+    if (nivel && !['Admin', 'Leitor'].includes(nivel)) {
+      return res.status(400).json({ erro: 'Nível deve ser "Admin" ou "Leitor"' });
+    }
+
+    // Email precisa ser único (a tabela tem constraint UNIQUE)
+    const [existe] = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
+    if (existe.length > 0) {
+      return res.status(409).json({ erro: 'Já existe um usuário com este email' });
+    }
+
+    // Gera o hash real da senha (cost 10)
+    const hash = await bcrypt.hash(senha, 10);
+
+    await db.query(
+      'INSERT INTO usuarios (nome, email, senha_hash, nivel) VALUES (?, ?, ?, ?)',
+      [nome, email, hash, nivel || 'Leitor']
+    );
+
+    res.status(201).json({ mensagem: 'Usuário criado com sucesso' });
+  } catch (erro) {
+    console.error('Erro ao cadastrar usuário:', erro);
+    res.status(500).json({ erro: 'Erro interno do servidor' });
+  }
+}
+
+module.exports = { login, cadastrar };
