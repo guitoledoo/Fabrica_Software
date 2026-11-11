@@ -3,133 +3,201 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estoque - Gestão de Ativos TI</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Estoque de Insumos — Gestão de Ativos TI</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+  <!-- ===== NAVBAR (mesma estrutura do ativos.html) ===== -->
   <nav class="navbar">
-    <div class="navbar-brand">🖥️ Gestão de Ativos TI</div>
+    <div class="navbar-brand">Gestão de Ativos TI</div>
     <div class="navbar-menu">
-  <a href="/index.html" class="nav-link">Dashboard</a>
-  <a href="/ativos.html" class="nav-link">Ativos</a>
-  <a href="/agencias.html" class="nav-link">Agências</a>
-  <a href="/estoque.html" class="nav-link">Estoque</a>
-  <a href="/historico.html" class="nav-link">Histórico</a>
-  <a href="/usuarios.html" class="nav-link">Usuários</a>
-</div>
+      <!-- Confira os href com a navbar do ativos.html — devem ser idênticos -->
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="ativos.html">Ativos</a>
+      <a class="nav-link" href="agencias.html">Agências</a>
+      <a class="nav-link ativo" href="estoque.html">Estoque</a>
+      <a class="nav-link" href="historico.html">Histórico</a>
+      <a class="nav-link" href="usuarios.html">Usuários</a>
+    </div>
     <div class="navbar-user">
-      <span id="usuario-nome"></span>
+      <span id="usuario-nome">Carregando...</span>
       <button id="btn-logout" class="btn-logout">Sair</button>
     </div>
   </nav>
 
+  <!-- ===== CONTEÚDO ===== -->
   <main class="container">
     <div class="cabecalho-pagina">
-      <h1 class="titulo-pagina">📦 Estoque de Insumos</h1>
+      <h1 class="titulo-pagina">Estoque de Insumos</h1>
       <button id="btn-movimentacao" class="btn btn-primario">+ Nova Movimentação</button>
     </div>
 
-    <!-- Saldo atual -->
+    <!-- Saldo por item -->
     <div class="painel">
       <h2>Saldo Atual por Item</h2>
-      <table class="tabela" id="tabela-estoque">
+      <table class="tabela">
         <thead>
           <tr>
-            <th>Tag</th>
-            <th>Descrição</th>
-            <th>Categoria</th>
-            <th>Entradas</th>
-            <th>Saídas</th>
-            <th>Saldo</th>
-            <th>Mínimo</th>
-            <th>Situação</th>
+            <th>TAG</th>
+            <th>DESCRIÇÃO</th>
+            <th>CATEGORIA</th>
+            <th>ENTRADAS</th>
+            <th>SAÍDAS</th>
+            <th>SALDO</th>
+            <th>MÍNIMO</th>
+            <th>SITUAÇÃO</th>
+            <th>AÇÕES</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="tabela-estoque"></tbody>
       </table>
     </div>
 
-    <!-- Últimas movimentações -->
+    <!-- Histórico -->
     <div class="painel">
       <h2>Últimas Movimentações</h2>
-      <table class="tabela" id="tabela-movimentacoes">
+      <table class="tabela">
         <thead>
           <tr>
-            <th>Data/Hora</th>
-            <th>Tag</th>
-            <th>Tipo</th>
-            <th>Qtd.</th>
-            <th>Origem/Destino</th>
-            <th>Observação</th>
+            <th>DATA/HORA</th>
+            <th>TAG</th>
+            <th>TIPO</th>
+            <th>QTD.</th>
+            <th>ORIGEM/DESTINO</th>
+            <th>OBSERVAÇÃO</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="tabela-movimentacoes"></tbody>
       </table>
     </div>
   </main>
 
-  <!-- Modal de movimentação -->
+  <!-- ===== MODAL NOVA MOVIMENTAÇÃO (sistema de modal global) ===== -->
   <div class="modal-fundo" id="modal-mov">
-    <div class="modal" style="max-width: 520px;">
+    <div class="modal">
       <div class="modal-cabecalho">
         <h3>Nova Movimentação</h3>
-        <button class="modal-fechar" onclick="fecharModal()">&times;</button>
+        <button class="modal-fechar" id="btn-fechar-mov" type="button">&times;</button>
+      </div>
+      <form id="form-mov">
+        <div class="modal-corpo">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="m-tipo">Tipo</label>
+              <select id="m-tipo" required>
+                <option value="Entrada">Entrada</option>
+                <option value="Saída">Saída</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="m-tag">Item</label>
+              <select id="m-tag" required></select>
+            </div>
+            <div class="form-group">
+              <label for="m-quantidade">Quantidade</label>
+              <input type="number" id="m-quantidade" min="1" required>
+            </div>
+            <div class="form-group" id="grupo-entrada">
+              <label for="m-quem-entregou">Quem entregou</label>
+              <input type="text" id="m-quem-entregou">
+            </div>
+            <div class="form-group" id="grupo-entrada-setor">
+              <label for="m-setor-entrada">Setor de origem</label>
+              <input type="text" id="m-setor-entrada">
+            </div>
+            <div class="form-group" id="grupo-saida">
+              <label for="m-para-quem">Para quem</label>
+              <input type="text" id="m-para-quem">
+            </div>
+            <div class="form-group" id="grupo-saida-setor">
+              <label for="m-setor-saida">Setor de destino</label>
+              <input type="text" id="m-setor-saida">
+            </div>
+            <div class="form-group col-inteira">
+              <label for="m-descricao">Observação</label>
+              <input type="text" id="m-descricao">
+            </div>
+          </div>
+        </div>
+        <div class="modal-rodape">
+          <button type="button" class="btn btn-secundario" id="btn-cancelar-mov">Cancelar</button>
+          <button type="button" class="btn btn-primario" id="btn-salvar">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL EDITAR ITEM ===== -->
+  <div class="modal-fundo" id="modal-editar">
+    <div class="modal">
+      <div class="modal-cabecalho">
+        <h3>Editar Item</h3>
+        <button class="modal-fechar" onclick="fecharModalEditar()" type="button">&times;</button>
       </div>
       <div class="modal-corpo">
-        <form id="form-mov">
-          <div class="form-group">
-            <label for="m-tipo">Tipo *</label>
-            <select id="m-tipo">
-              <option value="Entrada">Entrada (recebimento)</option>
-              <option value="Saída">Saída (entrega)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="m-tag">Item *</label>
-            <select id="m-tag"></select>
-          </div>
-          <div class="form-group">
-            <label for="m-quantidade">Quantidade *</label>
-            <input type="number" id="m-quantidade" min="1" value="1" required>
-          </div>
-          <!-- Campos de ENTRADA -->
-          <div class="grupo-entrada">
-            <div class="form-group">
-              <label for="m-quem-entregou">Quem entregou</label>
-              <input type="text" id="m-quem-entregou" placeholder="Ex: Dell Brasil">
-            </div>
-            <div class="form-group">
-              <label for="m-setor-entrada">Setor de destino</label>
-              <input type="text" id="m-setor-entrada" placeholder="Ex: Almoxarifado TI">
-            </div>
-          </div>
-          <!-- Campos de SAÍDA -->
-          <div class="grupo-saida" style="display:none;">
-            <div class="form-group">
-              <label for="m-para-quem">Entregue para</label>
-              <input type="text" id="m-para-quem" placeholder="Ex: joao.silva">
-            </div>
-            <div class="form-group">
-              <label for="m-setor-saida">Setor de origem</label>
-              <input type="text" id="m-setor-saida" placeholder="Ex: Almoxarifado TI">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="m-descricao">Observação</label>
-            <input type="text" id="m-descricao" placeholder="Ex: NF 12345 / Reposição mensal">
-          </div>
-        </form>
+        <p style="margin-bottom:16px;"><strong>TAG:</strong> <span id="edit-tag-info"></span></p>
+        <div class="form-group">
+          <label for="edit-descricao">Descrição</label>
+          <input type="text" id="edit-descricao">
+        </div>
+        <div class="form-group">
+          <label for="edit-categoria">Categoria</label>
+          <input type="text" id="edit-categoria">
+        </div>
+        <div class="form-group">
+          <label for="edit-minimo">Estoque mínimo</label>
+          <input type="number" id="edit-minimo" min="0">
+        </div>
       </div>
       <div class="modal-rodape">
-        <button class="btn btn-secundario" onclick="fecharModal()">Cancelar</button>
-        <button class="btn btn-primario" id="btn-salvar">Registrar</button>
+        <button class="btn btn-secundario" onclick="fecharModalEditar()" type="button">Cancelar</button>
+        <button class="btn btn-primario" id="btn-confirmar-edicao" type="button">Salvar alterações</button>
       </div>
     </div>
   </div>
 
+  <!-- ===== MODAL EXCLUIR MOVIMENTAÇÃO ===== -->
+<div class="modal-fundo" id="modal-excluir-mov">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-cabecalho">
+      <h3>Excluir Movimentação</h3>
+      <button class="modal-fechar" onclick="fecharModalExcluirMov()" type="button">&times;</button>
+    </div>
+    <div class="modal-corpo">
+      <p id="excluir-mov-mensagem" style="margin-bottom:12px;">Tem certeza?</p>
+      <p class="valor-alerta" style="font-size:0.85rem;">O saldo do item será recalculado. Esta ação não pode ser desfeita.</p>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn btn-secundario" onclick="fecharModalExcluirMov()" type="button">Cancelar</button>
+      <button class="btn btn-perigo" id="btn-confirmar-exclusao-mov" type="button">Excluir</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ===== MODAL CONFIRMAR EXCLUSÃO ===== -->
+  <div class="modal-fundo" id="modal-excluir">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-cabecalho">
+        <h3>Excluir Item</h3>
+        <button class="modal-fechar" onclick="fecharModalExcluir()" type="button">&times;</button>
+      </div>
+      <div class="modal-corpo">
+        <p id="excluir-mensagem" style="margin-bottom:12px;">Tem certeza?</p>
+        <p class="valor-alerta" style="font-size:0.85rem;">Esta ação não pode ser desfeita. Itens com movimentações registradas não podem ser excluídos.</p>
+      </div>
+      <div class="modal-rodape">
+        <button class="btn btn-secundario" onclick="fecharModalExcluir()" type="button">Cancelar</button>
+        <button class="btn btn-perigo" id="btn-confirmar-exclusao" type="button">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST (global) ===== -->
   <div class="toast" id="toast"></div>
 
-  <script src="/js/app.js"></script>
-  <script src="/js/estoque.js"></script>
+  <!-- ===== SCRIPTS ===== -->
+  <script src="js/app.js"></script>
+  <script src="js/estoque.js"></script>
 </body>
 </html>

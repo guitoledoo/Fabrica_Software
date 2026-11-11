@@ -95,4 +95,27 @@ async function deletarAgencia(req, res) {
   }
 }
 
-module.exports = { listarAgencias, criarAgencia, atualizarAgencia, deletarAgencia };
+// GET /api/agencias/:id/ativos — lista os ativos alocados em uma agência
+// SELECT * de propósito: retorna as colunas reais da tabela ativos, sem chutar nomes
+async function listarAtivosDaAgencia(req, res) {
+  try {
+    const { id } = req.params;
+
+    const [agencia] = await db.query('SELECT id FROM agencias WHERE id = ?', [id]);
+    if (agencia.length === 0) {
+      return res.status(404).json({ erro: 'Agência não encontrada' });
+    }
+
+    const [rows] = await db.query(
+      'SELECT * FROM ativos WHERE agencia_id = ? ORDER BY status, marca, modelo',
+      [id]
+    );
+
+    res.json(rows);
+  } catch (erro) {
+    console.error('Erro ao listar ativos da agência:', erro);
+    res.status(500).json({ erro: 'Erro interno do servidor' });
+  }
+}
+
+module.exports = { listarAgencias, listarAtivosDaAgencia, criarAgencia, atualizarAgencia, deletarAgencia };

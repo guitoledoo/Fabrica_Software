@@ -69,3 +69,51 @@ document.addEventListener('keydown', (e) => {
     document.querySelectorAll('.modal-fundo.aberto').forEach(m => m.classList.remove('aberto'));
   }
 });
+// ============================================================
+// MODAL DE CONFIRMAÇÃO GLOBAL (substitui confirm() nativo)
+// Uso: const ok = await confirmar('Mensagem', { titulo, textoOk, perigoso });
+// ============================================================
+(function () {
+  if (!document.body) return;
+
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="modal-fundo" id="modal-confirmar">
+      <div class="modal">
+        <div class="modal-cabecalho">
+          <h3 id="conf-titulo">Confirmar ação</h3>
+          <button class="modal-fechar" id="conf-fechar" type="button">&times;</button>
+        </div>
+        <div class="modal-corpo">
+          <p id="conf-mensagem"></p>
+        </div>
+        <div class="modal-rodape">
+          <button class="btn btn-secundario" id="conf-cancelar" type="button">Cancelar</button>
+          <button class="btn btn-perigo" id="conf-ok" type="button">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  `);
+
+  let resolver = null;
+  const fundo = document.getElementById('modal-confirmar');
+
+  function fechar(valor) {
+    fundo.classList.remove('aberto');
+    if (resolver) { resolver(valor); resolver = null; }
+  }
+
+  document.getElementById('conf-ok').addEventListener('click', () => fechar(true));
+  document.getElementById('conf-cancelar').addEventListener('click', () => fechar(false));
+  document.getElementById('conf-fechar').addEventListener('click', () => fechar(false));
+  fundo.addEventListener('click', e => { if (e.target === fundo) fechar(false); });
+
+  window.confirmar = function (mensagem, opcoes = {}) {
+    document.getElementById('conf-titulo').textContent = opcoes.titulo || 'Confirmar ação';
+    document.getElementById('conf-mensagem').textContent = mensagem;
+    const botaoOk = document.getElementById('conf-ok');
+    botaoOk.textContent = opcoes.textoOk || 'Confirmar';
+    botaoOk.className = opcoes.perigoso ? 'btn btn-perigo' : 'btn btn-primario';
+    fundo.classList.add('aberto');
+    return new Promise(r => { resolver = r; });
+  };
+})();

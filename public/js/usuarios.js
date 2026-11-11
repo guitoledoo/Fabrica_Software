@@ -3,43 +3,54 @@
 let idParaSenha = null;
 
 async function carregarUsuarios() {
-  const resposta = await fetchAutenticado(`${API_BASE}/api/usuarios`);
-  const usuarios = await resposta.json();
+  try {
+    const resposta = await fetchAutenticado(`${API_BASE}/api/usuarios`);
+    if (!resposta.ok) throw new Error('Erro ao carregar usuários');
+    const usuarios = await resposta.json();
 
-  const tbody = document.querySelector('#tabela-usuarios tbody');
-  tbody.innerHTML = '';
+    const tbody = document.querySelector('#tabela-usuarios tbody');
+    tbody.innerHTML = '';
 
-  if (usuarios.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="sem-dados">Nenhum usuário cadastrado</td></tr>';
-    return;
+    if (usuarios.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="sem-dados">Nenhum usuário cadastrado</td></tr>';
+      return;
+    }
+
+    const usuarioLogado = JSON.parse(localStorage.getItem('usuario') || '{}');
+
+    usuarios.forEach(u => {
+      const badge = u.nivel === 'Admin'
+        ? '<span class="badge badge-atualização">Admin</span>'
+        : '<span class="badge badge-em-estoque">Leitor</span>';
+
+      // Indicador visual de senha temporária ativa (Opção A)
+      const badgeTemp = u.troca_obrigatoria
+        ? ' <span class="badge badge-baixa">senha temporária</span>'
+        : '';
+
+      const souEu = u.id === usuarioLogado.id;
+
+      const linha = document.createElement('tr');
+      linha.innerHTML = `
+        <td>${u.id}</td>
+        <td><strong>${u.nome}</strong>${souEu ? ' <span style="color:var(--neutro-500); font-size:0.8rem;">(você)</span>' : ''}${badgeTemp}</td>
+        <td>${u.email}</td>
+        <td>${badge}</td>
+        <td>${formatarData(u.criado_em)}</td>
+        <td>
+          <div class="acoes-tabela">
+            <button class="btn-acao" onclick="abrirModalSenha(${u.id}, '${u.nome}')" title="Redefinir senha">🔑</button>
+            <button class="btn-acao" onclick="alternarNivel(${u.id}, '${u.nivel}')" title="Alternar Admin/Leitor">⇄</button>
+            <button class="btn-acao excluir" onclick="excluirUsuario(${u.id}, '${u.nome}', ${souEu})" title="Excluir">🗑️</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(linha);
+    });
+  } catch (erro) {
+    console.error('Erro ao carregar usuários:', erro);
+    mostrarToast('Erro ao carregar usuários', 'erro');
   }
-
-  const usuarioLogado = JSON.parse(localStorage.getItem('usuario') || '{}');
-
-  usuarios.forEach(u => {
-    const badge = u.nivel === 'Admin'
-      ? '<span class="badge badge-atualização">Admin</span>'
-      : '<span class="badge badge-em-estoque">Leitor</span>';
-
-    const souEu = u.id === usuarioLogado.id;
-
-    const linha = document.createElement('tr');
-    linha.innerHTML = `
-      <td>${u.id}</td>
-      <td><strong>${u.nome}</strong>${souEu ? ' <span style="color:var(--neutro-500); font-size:0.8rem;">(você)</span>' : ''}</td>
-      <td>${u.email}</td>
-      <td>${badge}</td>
-      <td>${formatarData(u.criado_em)}</td>
-      <td>
-        <div class="acoes-tabela">
-          <button class="btn-acao" onclick="abrirModalSenha(${u.id}, '${u.nome}')" title="Redefinir senha">🔑</button>
-          <button class="btn-acao" onclick="alternarNivel(${u.id}, '${u.nivel}')" title="Alternar Admin/Leitor">⇄</button>
-          <button class="btn-acao excluir" onclick="excluirUsuario(${u.id}, '${u.nome}', ${souEu})" title="Excluir">🗑️</button>
-        </div>
-      </td>
-    `;
-    tbody.appendChild(linha);
-  });
 }
 
 // ============================================================
@@ -89,48 +100,60 @@ document.getElementById('btn-salvar').addEventListener('click', async () => {
 });
 
 // ============================================================
-//  MODAL: REDEFINIR SENHA
+//  REDEFINIR SENHA (Opção A) — o SISTEMA gera a temporária
 // ============================================================
 function abrirModalSenha(id, nome) {
   idParaSenha = id;
   document.getElementById('senha-nome-usuario').textContent = nome;
-  document.getElementById('s-nova-senha').value = '';
   document.getElementById('modal-senha').classList.add('aberto');
 }
 
 function fecharModalSenha() {
   document.getElementById('modal-senha').classList.remove('aberto');
+  idParaSenha = null;
 }
 
 document.getElementById('btn-confirmar-senha').addEventListener('click', async () => {
-  const novaSenha = document.getElementById('s-nova-senha').value;
-
-  if (!novaSenha || novaSenha.length < 6) {
-    mostrarToast('A nova senha deve ter no mínimo 6 caracteres', 'erro');
-    return;
-  }
+  if (!idParaSenha) return;
 
   try {
+    // Corpo vazio de propósito: quem gera a senha é o sistema, não o admin
     const resposta = await fetchAutenticado(`${API_BASE}/api/usuarios/${idParaSenha}/senha`, {
       method: 'PUT',
-      body: JSON.stringify({ novaSenha })
+      body: JSON.stringify({})
     });
 
     const dados = await resposta.json();
 
     if (!resposta.ok) {
-      mostrarToast(dados.erro || 'Erro ao redefinir senha', 'erro');
+      mostrarToast(dados.erro || 'Erro ao gerar senha temporária', 'erro');
       return;
     }
 
     fecharModalSenha();
-    mostrarToast('Senha redefinida com sucesso', 'sucesso');
+
+    // A senha temporária é exibida UMA ÚNICA VEZ
+    document.getElementById('senha-temp-valor').textContent = dados.senha_temporaria;
+    document.getElementById('modal-senha-temp').classList.add('aberto');
+    carregarUsuarios(); // atualiza o badge "senha temporária"
 
   } catch (erro) {
     console.error('Erro ao redefinir senha:', erro);
     mostrarToast('Erro de conexão com o servidor', 'erro');
   }
 });
+
+function copiarSenhaTemp() {
+  const senha = document.getElementById('senha-temp-valor').textContent;
+  navigator.clipboard.writeText(senha)
+    .then(() => mostrarToast('Senha copiada para a área de transferência', 'sucesso'))
+    .catch(() => mostrarToast('Não foi possível copiar — selecione a senha manualmente', 'erro'));
+}
+
+function fecharModalSenhaTemp() {
+  document.getElementById('modal-senha-temp').classList.remove('aberto');
+  document.getElementById('senha-temp-valor').textContent = '—'; // a senha some da tela
+}
 
 // ============================================================
 //  AÇÕES RÁPIDAS: ALTERNAR NÍVEL E EXCLUIR

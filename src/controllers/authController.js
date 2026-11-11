@@ -19,7 +19,7 @@ async function login(req, res) {
     // Busca o usuário pelo email
     // (a tabela usa senha_hash — NÃO existe coluna "ativo")
     const [rows] = await db.query(
-      'SELECT id, nome, email, senha_hash, nivel FROM usuarios WHERE email = ?',
+      'SELECT id, nome, email, senha_hash, nivel, troca_obrigatoria FROM usuarios WHERE email = ?',
       [email]
     );
 
@@ -57,7 +57,8 @@ async function login(req, res) {
         id: usuario.id,
         nome: usuario.nome,
         email: usuario.email,
-        nivel: usuario.nivel
+        nivel: usuario.nivel,
+        troca_obrigatoria: !!usuario.troca_obrigatoria
       }
     });
 
@@ -106,4 +107,34 @@ async function cadastrar(req, res) {
   }
 }
 
-module.exports = { login, cadastrar };
+// ============================================================
+//  POST /api/auth/trocar-senha
+//  Usuário logado define a própria senha (obrigatório quando
+//  troca_obrigatoria = 1, ou voluntário, a qualquer momento)
+// ============================================================
+async function trocarSenha(req, res) {
+  try {
+    const { novaSenha } = req.body;
+
+    if (!novaSenha || novaSenha.length < 8) {
+      return res.status(400).json({ erro: 'A nova senha deve ter no mínimo 8 caracteres' });
+    }
+    if (!/[A-Z]/.test(novaSenha) || !/[a-z]/.test(novaSenha) || !/[0-9]/.test(novaSenha)) {
+      return res.status(400).json({ erro: 'A senha deve conter letra maiúscula, minúscula e número' });
+    }
+
+    const hash = await bcrypt.hash(novaSenha, 10);
+
+    await db.query(
+      'UPDATE usuarios SET senha_hash = ?, troca_obrigatoria = 0 WHERE id = ?',
+      [hash, req.usuario.id]
+    );
+
+    res.json({ mensagem: 'Senha alterada com sucesso' });
+  } catch (erro) {
+    console.error('Erro ao trocar senha:', erro);
+    res.status(500).json({ erro: 'Erro interno do servidor' });
+  }
+}
+
+module.exports = { login, cadastrar, trocarSenha };

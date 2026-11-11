@@ -83,28 +83,44 @@
     </div>
   </div>
 
-  <!-- Modal: redefinir senha -->
-  <div class="modal-fundo" id="modal-senha">
-    <div class="modal" style="max-width: 420px;">
-      <div class="modal-cabecalho">
-        <h3>Redefinir Senha</h3>
-        <button class="modal-fechar" onclick="fecharModalSenha()">&times;</button>
-      </div>
-      <div class="modal-corpo">
-        <p style="margin-bottom: 14px;">Definindo nova senha para <strong id="senha-nome-usuario"></strong></p>
-        <div class="form-group">
-          <label for="s-nova-senha">Nova Senha *</label>
-          <input type="password" id="s-nova-senha" minlength="6" placeholder="Mínimo de 6 caracteres">
-        </div>
-      </div>
-      <div class="modal-rodape">
-        <button class="btn btn-secundario" onclick="fecharModalSenha()">Cancelar</button>
-        <button class="btn btn-primario" id="btn-confirmar-senha">Redefinir</button>
-      </div>
+  <!-- ===== MODAL REDEFINIR SENHA ===== -->
+<div class="modal-fundo" id="modal-senha">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-cabecalho">
+      <h3>Redefinir Senha</h3>
+      <button class="modal-fechar" onclick="fecharModalSenha()" type="button">&times;</button>
+    </div>
+    <div class="modal-corpo">
+      <p>Gerar uma <strong>senha temporária</strong> para <strong id="senha-nome-usuario">—</strong>?</p>
+      <p class="valor-alerta" style="font-size:0.85rem;margin-top:8px;">A senha atual deixa de valer imediatamente. O usuário será obrigado a definir uma nova no próximo login.</p>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn btn-secundario" onclick="fecharModalSenha()" type="button">Cancelar</button>
+      <button class="btn btn-primario" id="btn-confirmar-senha" type="button">🔑 Gerar senha temporária</button>
     </div>
   </div>
+</div>
 
   <div class="toast" id="toast"></div>
+
+  <!-- ===== MODAL SENHA TEMPORÁRIA ===== -->
+<div class="modal-fundo" id="modal-senha-temp">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-cabecalho">
+      <h3>Senha Temporária Gerada</h3>
+      <button class="modal-fechar" onclick="fecharModalSenhaTemp()" type="button">&times;</button>
+    </div>
+    <div class="modal-corpo">
+      <p style="margin-bottom:12px;">Passe esta senha <strong>pessoalmente</strong> ao usuário. Ela será exibida <strong>apenas agora</strong> — não será possível recuperá-la depois.</p>
+      <p class="senha-temp-valor" id="senha-temp-valor">—</p>
+      <p class="valor-alerta" style="font-size:0.85rem;margin-top:12px;">No próximo login, o usuário será obrigado a definir sua própria senha.</p>
+    </div>
+    <div class="modal-rodape">
+      <button class="btn btn-secundario" onclick="copiarSenhaTemp()" type="button">📋 Copiar</button>
+      <button class="btn btn-primario" onclick="fecharModalSenhaTemp()" type="button">Concluir</button>
+    </div>
+  </div>
+</div>
 
   <script src="/js/app.js"></script>
   <script src="/js/usuarios.js"></script>

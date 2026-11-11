@@ -426,3 +426,72 @@ body {
 }
 .toast.sucesso { background: var(--sucesso); }
 .toast.erro { background: var(--perigo); }
+/* ===== Modal de confirmação global ===== */
+#modal-confirmar .modal { max-width: 420px; }
+#conf-mensagem { color: var(--neutro-700); font-size: 0.95rem; }
+
+/* ===== Agências — linhas expansíveis ===== */
+.linha-agencia { cursor: pointer; }
+.seta-expansao {
+  display: inline-block;
+  color: var(--neutro-500);
+  font-size: 0.8rem;
+  transition: transform 0.15s;
+}
+.seta-expansao.expandida { transform: rotate(90deg); }
+
+.linha-detalhes > td {
+  padding: 0 !important;
+  background: #fafbfd;
+  border-bottom: 1.5px solid var(--neutro-300);
+}
+.detalhes-agencia { padding: 18px 22px; }
+
+.ficha-agencia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.ficha-item {
+  background: var(--branco);
+  border: 1px solid #eef1f5;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.ficha-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--neutro-500);
+  margin-bottom: 2px;
+}
+.ficha-valor { font-size: 0.92rem; color: var(--neutro-900); font-weight: 500; }
+
+.ativos-titulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--neutro-700);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+.tabela-ativos-agencia { font-size: 0.85rem; }
+.sem-ativos-agencia { color: var(--neutro-500); font-style: italic; font-size: 0.9rem; }
+
+/* ===== Senha temporária ===== */
+.senha-temp-valor {
+  font-family: 'Courier New', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-align: center;
+  background: var(--neutro-100, #f0f2f5);
+  border: 1.5px dashed var(--neutro-300, #ccc);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--neutro-900, #111);
+  user-select: all;
+}
