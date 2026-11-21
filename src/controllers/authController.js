@@ -3,10 +3,7 @@ const db = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// ============================================================
-//  POST /api/auth/login
 //  Autentica o usuário e devolve um token JWT válido por 8h
-// ============================================================
 async function login(req, res) {
   try {
     const { email, senha } = req.body;
@@ -68,11 +65,8 @@ async function login(req, res) {
   }
 }
 
-// ============================================================
-//  POST /api/auth/cadastro
 //  Cria um novo usuário (provisionamento). O hash da senha é
 //  gerado aqui — nunca armazenamos a senha em texto puro
-// ============================================================
 async function cadastrar(req, res) {
   try {
     const { nome, email, senha, nivel } = req.body;
@@ -107,11 +101,8 @@ async function cadastrar(req, res) {
   }
 }
 
-// ============================================================
-//  POST /api/auth/trocar-senha
 //  Usuário logado define a própria senha (obrigatório quando
 //  troca_obrigatoria = 1, ou voluntário, a qualquer momento)
-// ============================================================
 async function trocarSenha(req, res) {
   try {
     const { novaSenha } = req.body;

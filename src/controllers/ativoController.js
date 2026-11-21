@@ -1,11 +1,7 @@
 // src/controllers/ativoController.js
 const db = require('../config/database');
 
-// ============================================================
-//  GET /api/ativos
 //  Lista todos os ativos com filtros opcionais
-//  Query params: ?agencia=1&status=Em Uso&busca=dell
-// ============================================================
 async function listarAtivos(req, res) {
   try {
     const { agencia, status, busca } = req.query;
@@ -45,10 +41,7 @@ async function listarAtivos(req, res) {
   }
 }
 
-// ============================================================
-//  GET /api/ativos/:id
 //  Busca um ativo específico pelo ID (Service Tag)
-// ============================================================
 async function buscarAtivo(req, res) {
   try {
     const { id } = req.params;
@@ -72,11 +65,7 @@ async function buscarAtivo(req, res) {
   }
 }
 
-// ============================================================
-//  POST /api/ativos
 //  Cria um novo ativo
-//  Corpo: { id, patrimonio, marca, modelo, categoria, agencia_id, ... }
-// ============================================================
 async function criarAtivo(req, res) {
   try {
     const {
@@ -122,10 +111,7 @@ async function criarAtivo(req, res) {
   }
 }
 
-// ============================================================
-//  PUT /api/ativos/:id
 //  Atualiza um ativo existente
-// ============================================================
 async function atualizarAtivo(req, res) {
   try {
     const { id } = req.params;
@@ -176,10 +162,7 @@ async function atualizarAtivo(req, res) {
   }
 }
 
-// ============================================================
-//  DELETE /api/ativos/:id
 //  Remove um ativo (com aprovação de admin)
-// ============================================================
 async function deletarAtivo(req, res) {
   try {
     const { id } = req.params;
@@ -191,7 +174,6 @@ async function deletarAtivo(req, res) {
     }
 
     // Registra a baixa no histórico ANTES de deletar
-    // (mesmo com ON DELETE CASCADE, registramos para auditoria)
     await db.query(
       `INSERT INTO historico_ativos (ativo_id, tipo, descricao, usuario_email)
        VALUES (?, 'Baixa', 'Ativo removido do sistema', ?)`,

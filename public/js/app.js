@@ -69,10 +69,7 @@ document.addEventListener('keydown', (e) => {
     document.querySelectorAll('.modal-fundo.aberto').forEach(m => m.classList.remove('aberto'));
   }
 });
-// ============================================================
 // MODAL DE CONFIRMAÇÃO GLOBAL (substitui confirm() nativo)
-// Uso: const ok = await confirmar('Mensagem', { titulo, textoOk, perigoso });
-// ============================================================
 (function () {
   if (!document.body) return;
 
