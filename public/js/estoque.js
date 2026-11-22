@@ -301,3 +301,50 @@ document.getElementById('modal-excluir-mov')?.addEventListener('click', e => {
   if (e.target.id === 'modal-excluir-mov') fecharModalExcluirMov();
 });
 });
+// ---------- NOVO ITEM DO CATÁLOGO (Admin) ----------
+function abrirModalNovoItem() {
+  document.getElementById('form-novo-item').reset();
+  document.getElementById('n-minimo').value = 0;
+  document.getElementById('modal-novo-item').classList.add('aberto');
+}
+
+function fecharModalNovoItem() {
+  document.getElementById('modal-novo-item').classList.remove('aberto');
+}
+
+async function salvarNovoItem(evento) {
+  evento.preventDefault();
+
+  const tag = document.getElementById('n-tag').value.trim();
+  const descricao = document.getElementById('n-descricao').value.trim();
+  const categoria = document.getElementById('n-categoria').value.trim();
+  const minimo = Number(document.getElementById('n-minimo').value) || 0;
+
+  try {
+    const resposta = await fetchAutenticado(`${API_BASE}/api/estoque/itens`, {
+      method: 'POST',
+      body: JSON.stringify({ tag, descricao, categoria, minimo })
+    });
+    const dados = await resposta.json();
+    if (!resposta.ok) {
+      mostrarToast(dados.erro || 'Erro ao cadastrar item', 'erro');
+      return;
+    }
+    mostrarToast('Item cadastrado com sucesso', 'sucesso');
+    fecharModalNovoItem();
+    carregarEstoque(); // atualiza a tabela e o seletor do modal de movimentação
+  } catch (erro) {
+    console.error('Erro ao cadastrar item:', erro);
+    mostrarToast('Erro interno do servidor', 'erro');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btn-novo')?.addEventListener('click', abrirModalNovoItem);
+  document.getElementById('btn-fechar-novo-item')?.addEventListener('click', fecharModalNovoItem);
+  document.getElementById('btn-cancelar-novo-item')?.addEventListener('click', fecharModalNovoItem);
+  document.getElementById('form-novo-item')?.addEventListener('submit', salvarNovoItem);
+  document.getElementById('modal-novo-item')?.addEventListener('click', e => {
+    if (e.target.id === 'modal-novo-item') fecharModalNovoItem();
+  });
+});

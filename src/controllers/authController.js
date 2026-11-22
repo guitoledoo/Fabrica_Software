@@ -65,42 +65,6 @@ async function login(req, res) {
   }
 }
 
-//  Cria um novo usuário (provisionamento). O hash da senha é
-//  gerado aqui — nunca armazenamos a senha em texto puro
-async function cadastrar(req, res) {
-  try {
-    const { nome, email, senha, nivel } = req.body;
-
-    if (!nome || !email || !senha) {
-      return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios' });
-    }
-
-    // Nível só pode ser Admin ou Leitor (mesma enum da tabela)
-    if (nivel && !['Admin', 'Leitor'].includes(nivel)) {
-      return res.status(400).json({ erro: 'Nível deve ser "Admin" ou "Leitor"' });
-    }
-
-    // Email precisa ser único (a tabela tem constraint UNIQUE)
-    const [existe] = await db.query('SELECT id FROM usuarios WHERE email = ?', [email]);
-    if (existe.length > 0) {
-      return res.status(409).json({ erro: 'Já existe um usuário com este email' });
-    }
-
-    // Gera o hash real da senha (cost 10)
-    const hash = await bcrypt.hash(senha, 10);
-
-    await db.query(
-      'INSERT INTO usuarios (nome, email, senha_hash, nivel) VALUES (?, ?, ?, ?)',
-      [nome, email, hash, nivel || 'Leitor']
-    );
-
-    res.status(201).json({ mensagem: 'Usuário criado com sucesso' });
-  } catch (erro) {
-    console.error('Erro ao cadastrar usuário:', erro);
-    res.status(500).json({ erro: 'Erro interno do servidor' });
-  }
-}
-
 //  Usuário logado define a própria senha (obrigatório quando
 //  troca_obrigatoria = 1, ou voluntário, a qualquer momento)
 async function trocarSenha(req, res) {
@@ -128,4 +92,4 @@ async function trocarSenha(req, res) {
   }
 }
 
-module.exports = { login, cadastrar, trocarSenha };
+module.exports = { login, trocarSenha };
